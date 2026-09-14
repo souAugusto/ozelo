@@ -1,20 +1,43 @@
 import { IconCircle, IconCircleCheckFilled } from '@tabler/icons-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { OnboardingScreen } from '@/components/onboarding/OnboardingScreen';
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 import { PrimaryButton } from '@/components/ui/Button';
+import { useAuth } from '@/context/AuthProvider';
 import { useOnboarding } from '@/context/OnboardingContext';
+import { startCheckout } from '@/lib/stripe';
 import { Colors, Gradient, IconSize, Radius, Spacing, Typography } from '@/constants/theme';
 import type { SubscriptionPlan } from '@/types/database';
 
 export default function PaywallStep() {
+  const { session } = useAuth();
   const { answers, update } = useOnboarding();
   const selectedPlan = answers.selectedPlan;
   const selectPlan = (plan: SubscriptionPlan) => update('selectedPlan', plan);
+  const [startingCheckout, setStartingCheckout] = useState(false);
+
+  async function handleStart() {
+    // A session already exists when someone lands here after confirming
+    // their e-mail (or via the tabs guard) — skip account creation and
+    // go straight to Stripe instead of showing the signup form again.
+    if (!session) {
+      router.push('/(onboarding)/create-account');
+      return;
+    }
+    setStartingCheckout(true);
+    try {
+      await startCheckout(selectedPlan);
+    } catch (error) {
+      Alert.alert('Não foi possível iniciar o pagamento', (error as Error).message);
+    } finally {
+      setStartingCheckout(false);
+    }
+  }
 
   return (
     <OnboardingScreen>
@@ -61,10 +84,7 @@ export default function PaywallStep() {
       </Pressable>
 
       <View style={styles.footer}>
-        <PrimaryButton
-          label="Começar agora"
-          onPress={() => router.push('/(onboarding)/create-account')}
-        />
+        <PrimaryButton label="Começar agora" loading={startingCheckout} onPress={handleStart} />
         <Text style={styles.disclaimer}>Cancele quando quiser · sem compromisso</Text>
       </View>
     </OnboardingScreen>

@@ -1,0 +1,55 @@
+<!--
+  Template de e-mail "Confirm signup" do Ozelo.
+
+  Como aplicar (não dá pra fazer isso por API/CLI, só pelo painel):
+  1. Supabase Dashboard → Authentication → Emails → Templates → "Confirm signup"
+  2. Cole o conteúdo abaixo no campo "Message body" (mantém o Subject como preferir,
+     ex: "Confirme sua conta Ozelo")
+  3. Em Authentication → URL Configuration, adicione aos "Redirect URLs":
+     https://ozelo.vercel.app/confirm-callback
+     (e a variante ozelo://confirm-callback se for testar no app nativo)
+
+  E-mail clients (Outlook em especial) não renderizam CSS gradient em background,
+  então o botão usa a cor sólida #7C4DFF como fallback seguro em vez do degradê
+  usado no app.
+-->
+<div style="background-color:#0F0F14;padding:40px 16px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+  <table role="presentation" width="100%" style="max-width:480px;margin:0 auto;border-collapse:collapse;">
+    <tr>
+      <td style="padding-bottom:24px;text-align:center;">
+        <div style="display:inline-block;width:56px;height:56px;border-radius:16px;background-color:#7C4DFF;line-height:56px;font-size:24px;">💉</div>
+      </td>
+    </tr>
+    <tr>
+      <td style="background-color:#1E1E27;border:0.5px solid #33333F;border-radius:12px;padding:32px 28px;">
+        <h1 style="margin:0 0 12px;color:#F5F3FA;font-size:22px;font-weight:700;text-align:center;">
+          Confirme sua conta
+        </h1>
+        <p style="margin:0 0 24px;color:#8A8792;font-size:15px;line-height:1.5;text-align:center;">
+          Falta um passo pra começar a acompanhar seu tratamento no Ozelo.
+          Confirme seu e-mail pra ativar sua conta e liberar sua assinatura.
+        </p>
+        <table role="presentation" width="100%" style="border-collapse:collapse;">
+          <tr>
+            <td style="text-align:center;">
+              <a
+                href="{{ .ConfirmationURL }}"
+                style="display:inline-block;background-color:#7C4DFF;color:#FFFFFF;text-decoration:none;font-size:16px;font-weight:700;padding:14px 32px;border-radius:12px;"
+              >
+                Confirmar e-mail
+              </a>
+            </td>
+          </tr>
+        </table>
+        <p style="margin:24px 0 0;color:#5F5E5A;font-size:12px;line-height:1.5;text-align:center;">
+          Se você não criou essa conta, pode ignorar este e-mail com segurança.
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding-top:24px;text-align:center;">
+        <p style="margin:0;color:#5F5E5A;font-size:12px;">Ozelo — acompanhamento para uso de GLP-1</p>
+      </td>
+    </tr>
+  </table>
+</div>

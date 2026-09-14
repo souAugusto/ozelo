@@ -12,7 +12,7 @@ import { useAuth } from '@/context/AuthProvider';
 import { BorderWidth, Colors } from '@/constants/theme';
 
 export default function TabsLayout() {
-  const { session, loading } = useAuth();
+  const { session, hasActiveAccess, loading } = useAuth();
 
   if (loading) {
     return (
@@ -24,6 +24,10 @@ export default function TabsLayout() {
 
   if (!session) {
     return <Redirect href="/(auth)/login" />;
+  }
+
+  if (!hasActiveAccess) {
+    return <Redirect href="/(onboarding)/paywall" />;
   }
 
   return (

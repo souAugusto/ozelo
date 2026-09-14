@@ -27,45 +27,35 @@ export default function CreateAccountStep() {
   async function handleSubmit() {
     setSubmitting(true);
     try {
+      const symptomsToLog = answers.symptoms.filter((s): s is Symptom =>
+        KNOWN_SYMPTOMS.includes(s as Symptom)
+      );
+
+      // Onboarding answers travel as user metadata: Supabase saves this the
+      // instant the account is created, even before the email is confirmed
+      // and a session exists — a DB trigger (handle_new_user) turns it into
+      // the profile row and symptom logs.
       const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password,
-        options: { data: { full_name: fullName.trim() } },
+        options: {
+          data: {
+            full_name: fullName.trim(),
+            medication: answers.medication,
+            current_weight_kg: answers.currentWeight || null,
+            goal_weight_kg: answers.goalWeight || null,
+            symptoms: symptomsToLog,
+          },
+          emailRedirectTo: `${process.env.EXPO_PUBLIC_APP_URL}/confirm-callback`,
+        },
       });
       if (error) throw error;
 
       await AsyncStorage.setItem(ONBOARDING_SEEN_KEY, 'true');
 
       if (!data.session) {
-        Alert.alert(
-          'Confirme seu e-mail',
-          'Enviamos um link de confirmação. Depois de confirmar, faça login pra continuar.'
-        );
-        router.replace('/(auth)/login');
+        router.replace({ pathname: '/(onboarding)/confirm-email', params: { email: email.trim() } });
         return;
-      }
-
-      await supabase
-        .from('profiles')
-        .update({
-          medication: answers.medication,
-          current_weight_kg: answers.currentWeight ? Number(answers.currentWeight) : null,
-          goal_weight_kg: answers.goalWeight ? Number(answers.goalWeight) : null,
-          onboarding_completed_at: new Date().toISOString(),
-        })
-        .eq('id', data.session.user.id);
-
-      const symptomsToLog = answers.symptoms.filter((s): s is Symptom =>
-        KNOWN_SYMPTOMS.includes(s as Symptom)
-      );
-      if (symptomsToLog.length > 0) {
-        await supabase.from('symptom_logs').insert(
-          symptomsToLog.map((symptom) => ({
-            user_id: data.session!.user.id,
-            symptom,
-            intensity: 'mild' as const,
-          }))
-        );
       }
 
       await startCheckout(answers.selectedPlan);

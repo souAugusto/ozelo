@@ -19,8 +19,15 @@ export default function LoginScreen() {
     setSubmitting(true);
     try {
       const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-      if (error) throw error;
-      router.replace('/(tabs)');
+      if (error) {
+        if (error.message.toLowerCase().includes('email not confirmed')) {
+          throw new Error('Seu e-mail ainda não foi confirmado. Verifique sua caixa de entrada.');
+        }
+        throw error;
+      }
+      // Let the root route decide between the paywall and the app based on
+      // the subscription status, instead of assuming access here.
+      router.replace('/');
     } catch (error) {
       Alert.alert('Não foi possível entrar', (error as Error).message);
     } finally {
