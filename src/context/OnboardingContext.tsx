@@ -15,8 +15,8 @@ const initialAnswers: OnboardingAnswers = {
   medication: null,
   symptoms: [],
   bowelFrequency: null,
-  currentWeight: '',
-  goalWeight: '',
+  currentWeight: '85',
+  goalWeight: '75',
   selectedPlan: 'annual',
 };
 
