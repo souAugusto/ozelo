@@ -1,6 +1,6 @@
 import { IconClock, IconCrown, IconFileExport, IconLock, IconScale, IconStethoscope } from '@tabler/icons-react-native';
 import { router } from 'expo-router';
-import { Alert, ScrollView, Share, StyleSheet, Switch, Text, View } from 'react-native';
+import { ScrollView, Share, StyleSheet, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Avatar } from '@/components/ui/Avatar';
@@ -8,6 +8,7 @@ import { TextDangerButton } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import { useAuth } from '@/context/AuthProvider';
+import { showAlert } from '@/lib/alert';
 import { openBillingPortal } from '@/lib/stripe';
 import { supabase } from '@/lib/supabase';
 import { Colors, IconSize, Spacing, Typography } from '@/constants/theme';
@@ -46,7 +47,7 @@ export default function ProfileScreen() {
     try {
       await openBillingPortal();
     } catch (error) {
-      Alert.alert('Não foi possível abrir o portal', (error as Error).message);
+      showAlert('Não foi possível abrir o portal', (error as Error).message);
     }
   }
 
@@ -64,7 +65,7 @@ export default function ProfileScreen() {
         message: JSON.stringify({ profile, meals, bowel, symptoms, measurements }, null, 2),
       });
     } catch (error) {
-      Alert.alert('Não foi possível exportar', (error as Error).message);
+      showAlert('Não foi possível exportar', (error as Error).message);
     }
   }
 

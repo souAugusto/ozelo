@@ -1,12 +1,13 @@
 import { IconVaccine } from '@tabler/icons-react-native';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { GradientIconTile } from '@/components/ui/Avatar';
 import { PrimaryButton } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { showAlert } from '@/lib/alert';
 import { supabase } from '@/lib/supabase';
 import { Colors, Spacing, Typography } from '@/constants/theme';
 
@@ -29,7 +30,7 @@ export default function LoginScreen() {
       // the subscription status, instead of assuming access here.
       router.replace('/');
     } catch (error) {
-      Alert.alert('Não foi possível entrar', (error as Error).message);
+      showAlert('Não foi possível entrar', (error as Error).message);
     } finally {
       setSubmitting(false);
     }

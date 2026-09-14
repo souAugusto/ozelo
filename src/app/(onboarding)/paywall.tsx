@@ -2,7 +2,7 @@ import { IconCircle, IconCircleCheckFilled } from '@tabler/icons-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { OnboardingScreen } from '@/components/onboarding/OnboardingScreen';
 import { Badge } from '@/components/ui/Badge';
@@ -10,6 +10,7 @@ import { Card } from '@/components/ui/Card';
 import { PrimaryButton } from '@/components/ui/Button';
 import { useAuth } from '@/context/AuthProvider';
 import { useOnboarding } from '@/context/OnboardingContext';
+import { showAlert } from '@/lib/alert';
 import { startCheckout } from '@/lib/stripe';
 import { Colors, Gradient, IconSize, Radius, Spacing, Typography } from '@/constants/theme';
 import type { SubscriptionPlan } from '@/types/database';
@@ -33,7 +34,7 @@ export default function PaywallStep() {
     try {
       await startCheckout(selectedPlan);
     } catch (error) {
-      Alert.alert('Não foi possível iniciar o pagamento', (error as Error).message);
+      showAlert('Não foi possível iniciar o pagamento', (error as Error).message);
     } finally {
       setStartingCheckout(false);
     }

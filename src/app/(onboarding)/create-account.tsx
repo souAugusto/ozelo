@@ -1,12 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { OnboardingScreen } from '@/components/onboarding/OnboardingScreen';
 import { PrimaryButton } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useOnboarding } from '@/context/OnboardingContext';
+import { showAlert } from '@/lib/alert';
 import { startCheckout } from '@/lib/stripe';
 import { supabase } from '@/lib/supabase';
 import { Typography } from '@/constants/theme';
@@ -60,7 +61,7 @@ export default function CreateAccountStep() {
 
       await startCheckout(answers.selectedPlan);
     } catch (error) {
-      Alert.alert('Não foi possível continuar', (error as Error).message);
+      showAlert('Não foi possível continuar', (error as Error).message);
     } finally {
       setSubmitting(false);
     }

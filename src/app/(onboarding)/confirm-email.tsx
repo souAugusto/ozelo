@@ -1,11 +1,12 @@
 import { IconMailCheck } from '@tabler/icons-react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { OnboardingScreen } from '@/components/onboarding/OnboardingScreen';
 import { GradientIconTile } from '@/components/ui/Avatar';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/Button';
+import { showAlert } from '@/lib/alert';
 import { supabase } from '@/lib/supabase';
 import { Colors, Spacing, Typography } from '@/constants/theme';
 
@@ -19,9 +20,9 @@ export default function ConfirmEmailStep() {
     try {
       const { error } = await supabase.auth.resend({ type: 'signup', email });
       if (error) throw error;
-      Alert.alert('Enviado', 'Reenviamos o link de confirmação pro seu e-mail.');
+      showAlert('Enviado', 'Reenviamos o link de confirmação pro seu e-mail.');
     } catch (error) {
-      Alert.alert('Não foi possível reenviar', (error as Error).message);
+      showAlert('Não foi possível reenviar', (error as Error).message);
     } finally {
       setResending(false);
     }
