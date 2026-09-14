@@ -25,6 +25,19 @@ export async function startCheckout(plan: SubscriptionPlan) {
   await openCheckoutUrl(data.url);
 }
 
+/** Redeems a promo code, granting access without going through Stripe. */
+export async function redeemPromoCode(code: string) {
+  const { data, error } = await supabase.functions.invoke<{
+    success?: boolean;
+    daysGranted?: number;
+    error?: string;
+  }>('redeem-promo-code', { body: { code } });
+
+  if (error) throw error;
+  if (!data?.success) throw new Error(data?.error ?? 'Não foi possível aplicar o código');
+  return data.daysGranted!;
+}
+
 /** Opens the Stripe customer portal so the user can manage or cancel their plan. */
 export async function openBillingPortal() {
   const { data, error } = await supabase.functions.invoke<{ url?: string; error?: string }>(

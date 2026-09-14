@@ -7,20 +7,24 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { OnboardingScreen } from '@/components/onboarding/OnboardingScreen';
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
-import { PrimaryButton } from '@/components/ui/Button';
+import { PrimaryButton, SecondaryButton } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { useAuth } from '@/context/AuthProvider';
 import { useOnboarding } from '@/context/OnboardingContext';
 import { showAlert } from '@/lib/alert';
-import { startCheckout } from '@/lib/stripe';
+import { redeemPromoCode, startCheckout } from '@/lib/stripe';
 import { Colors, Gradient, IconSize, Radius, Spacing, Typography } from '@/constants/theme';
 import type { SubscriptionPlan } from '@/types/database';
 
 export default function PaywallStep() {
-  const { session } = useAuth();
+  const { session, refreshProfile } = useAuth();
   const { answers, update } = useOnboarding();
   const selectedPlan = answers.selectedPlan;
   const selectPlan = (plan: SubscriptionPlan) => update('selectedPlan', plan);
   const [startingCheckout, setStartingCheckout] = useState(false);
+  const [showPromoField, setShowPromoField] = useState(false);
+  const [promoCode, setPromoCode] = useState('');
+  const [applyingPromo, setApplyingPromo] = useState(false);
 
   async function handleStart() {
     // A session already exists when someone lands here after confirming
@@ -37,6 +41,24 @@ export default function PaywallStep() {
       showAlert('Não foi possível iniciar o pagamento', (error as Error).message);
     } finally {
       setStartingCheckout(false);
+    }
+  }
+
+  async function handleApplyPromo() {
+    if (!session) {
+      router.push('/(onboarding)/create-account');
+      return;
+    }
+    setApplyingPromo(true);
+    try {
+      const days = await redeemPromoCode(promoCode);
+      await refreshProfile();
+      showAlert('Código aplicado!', `Você ganhou ${days} dias de acesso grátis.`);
+      router.replace('/');
+    } catch (error) {
+      showAlert('Não foi possível aplicar o código', (error as Error).message);
+    } finally {
+      setApplyingPromo(false);
     }
   }
 
@@ -87,6 +109,29 @@ export default function PaywallStep() {
       <View style={styles.footer}>
         <PrimaryButton label="Começar agora" loading={startingCheckout} onPress={handleStart} />
         <Text style={styles.disclaimer}>Cancele quando quiser · sem compromisso</Text>
+
+        {showPromoField ? (
+          <View style={styles.promoRow}>
+            <View style={styles.promoInputWrap}>
+              <Input
+                value={promoCode}
+                onChangeText={setPromoCode}
+                placeholder="Código promocional"
+                autoCapitalize="characters"
+              />
+            </View>
+            <SecondaryButton
+              label="Aplicar"
+              loading={applyingPromo}
+              disabled={!promoCode.trim()}
+              onPress={handleApplyPromo}
+            />
+          </View>
+        ) : (
+          <Pressable onPress={() => setShowPromoField(true)}>
+            <Text style={styles.promoLink}>Tenho um código promocional</Text>
+          </Pressable>
+        )}
       </View>
     </OnboardingScreen>
   );
@@ -149,5 +194,18 @@ const styles = StyleSheet.create({
   disclaimer: {
     ...Typography.caption,
     textAlign: 'center',
+  },
+  promoLink: {
+    ...Typography.bodySecondary,
+    textAlign: 'center',
+    textDecorationLine: 'underline',
+  },
+  promoRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    alignItems: 'center',
+  },
+  promoInputWrap: {
+    flex: 1,
   },
 });
