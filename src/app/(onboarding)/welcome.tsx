@@ -1,6 +1,6 @@
 import { IconVaccine } from '@tabler/icons-react-native';
 import { router } from 'expo-router';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { OnboardingScreen } from '@/components/onboarding/OnboardingScreen';
 import { GradientIconTile } from '@/components/ui/Avatar';
@@ -22,7 +22,14 @@ export default function WelcomeScreen() {
           pensado pra quem usa Ozempic, Mounjaro ou Wegovy.
         </Text>
       </View>
-      <PrimaryButton label="Começar" onPress={() => router.push('/(onboarding)/medication')} />
+      <View style={styles.actions}>
+        <PrimaryButton label="Começar" onPress={() => router.push('/(onboarding)/medication')} />
+        <Pressable onPress={() => router.push('/(auth)/login')} style={styles.loginLink}>
+          <Text style={styles.loginLinkLabel}>
+            Já tem conta? <Text style={styles.loginLinkHighlight}>Entrar</Text>
+          </Text>
+        </Pressable>
+      </View>
     </OnboardingScreen>
   );
 }
@@ -40,5 +47,18 @@ const styles = StyleSheet.create({
   subtitle: {
     textAlign: 'center',
     color: Colors.textSecondary,
+  },
+  actions: {
+    gap: Spacing.md,
+  },
+  loginLink: {
+    alignItems: 'center',
+  },
+  loginLinkLabel: {
+    ...Typography.bodySecondary,
+  },
+  loginLinkHighlight: {
+    color: Colors.accentMint,
+    fontWeight: '600',
   },
 });

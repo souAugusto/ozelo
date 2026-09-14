@@ -25,16 +25,19 @@ export default function Index() {
   }
 
   if (session) {
+    // Active access (paid or via promo code) always wins — someone who
+    // already unlocked the app shouldn't get bounced back into onboarding
+    // over a data quirk like a profile row missing onboarding_completed_at.
+    if (hasActiveAccess) {
+      return <Redirect href="/(tabs)" />;
+    }
     if (!profile?.onboarding_completed_at) {
       return <Redirect href="/(onboarding)/welcome" />;
     }
     // Account confirmed and onboarding data saved, but no active
     // subscription yet — send them back to finish the payment they
     // started before confirming their e-mail.
-    if (!hasActiveAccess) {
-      return <Redirect href="/(onboarding)/paywall" />;
-    }
-    return <Redirect href="/(tabs)" />;
+    return <Redirect href="/(onboarding)/paywall" />;
   }
 
   return <Redirect href={onboardingSeen ? '/(auth)/login' : '/(onboarding)/welcome'} />;
