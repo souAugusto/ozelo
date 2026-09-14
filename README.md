@@ -1,56 +1,91 @@
-# Welcome to your Expo app 👋
+# Ozelo
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+App de acompanhamento para usuários de medicamentos GLP-1 (Ozempic, Mounjaro, Wegovy): medicação, alimentação, sintomas, controle intestinal, progresso e fotos.
 
-## Get started
+React Native + Expo (Expo Router), Supabase (auth, Postgres, storage) e Stripe (assinatura mensal/anual).
 
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Setup
 
 ```bash
-npm run reset-project
+npm install
+cp .env.example .env
+# preencha EXPO_PUBLIC_SUPABASE_URL, EXPO_PUBLIC_SUPABASE_ANON_KEY e EXPO_PUBLIC_APP_URL em .env
+
+npx expo start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Abra no simulador iOS/Android, no Expo Go, ou pressione `w` pra abrir a versão web.
 
-### Other setup steps
+## Supabase
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+1. Crie um projeto em [supabase.com](https://supabase.com).
+2. Aplique o schema (tabelas + RLS + bucket de storage privado):
 
-## Learn more
+   ```bash
+   npx supabase link --project-ref <seu-project-ref>
+   npx supabase db push
+   ```
 
-To learn more about developing your project with Expo, look at the following resources:
+   Ou cole o conteúdo de `supabase/migrations/0001_init.sql` no SQL Editor do painel.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+3. Configure os segredos das Edge Functions (**nunca** o `.env` do app — essas variáveis são só do servidor):
 
-## Join the community
+   ```bash
+   npx supabase secrets set --env-file .env
+   ```
 
-Join our community of developers creating universal apps.
+   (o `.env` deve conter `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_ANNUAL`, `APP_URL`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` — veja `.env.example`)
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+4. Deploy das Edge Functions:
+
+   ```bash
+   npx supabase functions deploy create-checkout-session
+   npx supabase functions deploy create-portal-session
+   npx supabase functions deploy stripe-webhook --no-verify-jwt
+   ```
+
+5. No painel do Stripe, crie um webhook apontando pra URL da função `stripe-webhook` (eventos: `checkout.session.completed`, `customer.subscription.*`, `invoice.payment_failed`) e copie o signing secret pra `STRIPE_WEBHOOK_SECRET`.
+
+## Stripe
+
+Crie dois preços recorrentes no Stripe:
+
+- Mensal: R$ 11,29/mês
+- Anual: R$ 7,90/mês, cobrado uma vez por ano (ou seja, R$ 94,80/ano)
+
+Copie os IDs de preço (`price_...`) pra `STRIPE_PRICE_MONTHLY` e `STRIPE_PRICE_ANNUAL`.
+
+## Deploy web (Vercel)
+
+O app exporta uma versão web estática via Expo Router (`app.json` → `web.output: "static"`).
+
+1. Importe o repositório no Vercel (o `vercel.json` já define `buildCommand`/`outputDirectory`).
+2. Nas Environment Variables do projeto Vercel, adicione **apenas as variáveis públicas**:
+   - `EXPO_PUBLIC_SUPABASE_URL`
+   - `EXPO_PUBLIC_SUPABASE_ANON_KEY`
+   - `EXPO_PUBLIC_APP_URL` (a URL do próprio deploy, ex: `https://ozelo.vercel.app`)
+3. Cada push na branch principal gera um deploy de produção; pushes em outras branches/PRs geram preview deploys automaticamente (comportamento padrão do Vercel).
+
+As chaves secretas do Stripe e do Supabase (service role) **nunca** vão para o Vercel — elas vivem só nos secrets das Edge Functions do Supabase.
+
+## Estrutura
+
+```
+src/
+  app/                    rotas (Expo Router)
+    (onboarding)/         funil de cadastro
+    (auth)/                login
+    (tabs)/                dashboard, diário, intestino, sintomas, progresso
+    profile.tsx, photos.tsx
+  components/
+    ui/                    Card, Button, Input, ProgressBar, SegmentedControl...
+    charts/                LineChart, BarChart (react-native-svg)
+    onboarding/            wrapper de tela do funil
+  context/                 AuthProvider, OnboardingContext
+  lib/                     supabase.ts, stripe.ts, queries.ts
+  constants/theme.ts       design tokens (cores, tipografia, espaçamento)
+  types/database.ts        tipos das tabelas do Supabase
+supabase/
+  migrations/0001_init.sql schema + RLS + bucket de storage
+  functions/                Edge Functions (checkout, portal, webhook)
+```

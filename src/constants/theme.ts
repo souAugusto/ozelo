@@ -1,65 +1,108 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * Design tokens for Ozelo. The app has a single, fixed dark visual identity —
+ * there is no light theme to switch to.
  */
-
-import '@/global.css';
-
-import { Platform } from 'react-native';
+import { Platform, TextStyle } from 'react-native';
 
 export const Colors = {
-  light: {
-    text: '#000000',
-    background: '#ffffff',
-    backgroundElement: '#F0F0F3',
-    backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
-  },
-  dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
-  },
+  background: '#0F0F14',
+  card: '#1E1E27',
+  cardBorder: '#33333F',
+  cardElevated: '#2A2A38',
+
+  gradientStart: '#7C4DFF',
+  gradientEnd: '#00E5C7',
+
+  accentCoral: '#FF3D9A',
+  accentAmber: '#FAC775',
+  accentMint: '#7CF5D0',
+
+  textPrimary: '#F5F3FA',
+  textSecondary: '#8A8792',
+  textMuted: '#5F5E5A',
+  textOnGradient: '#FFFFFF',
+
+  buttonSecondaryText: '#C9C7D1',
 } as const;
 
-export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
+export const Gradient = {
+  colors: [Colors.gradientStart, Colors.gradientEnd] as const,
+  // 135deg expressed as normalized start/end points for expo-linear-gradient.
+  start: { x: 0, y: 0 },
+  end: { x: 1, y: 1 },
+};
 
-export const Fonts = Platform.select({
-  ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
-  },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
-  },
-  web: {
-    sans: 'var(--font-display)',
-    serif: 'var(--font-serif)',
-    rounded: 'var(--font-rounded)',
-    mono: 'var(--font-mono)',
-  },
-});
+export const Radius = {
+  sm: 8,
+  md: 12,
+  lg: 16,
+  pill: 999,
+};
 
 export const Spacing = {
-  half: 2,
-  one: 4,
-  two: 8,
-  three: 16,
-  four: 24,
-  five: 32,
-  six: 64,
-} as const;
+  xxs: 4,
+  xs: 8,
+  sm: 12,
+  md: 16,
+  lg: 24,
+  xl: 32,
+  xxl: 48,
+};
 
-export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;
-export const MaxContentWidth = 800;
+export const BorderWidth = {
+  hairline: 0.5,
+  selected: 1.5,
+};
+
+const fontFamily = Platform.select({
+  ios: { serif: 'Georgia' },
+  android: { serif: 'serif' },
+  default: { serif: 'Georgia, serif' },
+});
+
+export const Typography: Record<string, TextStyle> = {
+  display: {
+    fontSize: 40,
+    fontWeight: '700',
+    color: Colors.textPrimary,
+    fontFamily: fontFamily?.serif,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: Colors.textPrimary,
+  },
+  subtitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: Colors.textSecondary,
+  },
+  body: {
+    fontSize: 15,
+    fontWeight: '400',
+    color: Colors.textPrimary,
+  },
+  bodySecondary: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: Colors.textSecondary,
+  },
+  caption: {
+    fontSize: 12,
+    fontWeight: '400',
+    color: Colors.textMuted,
+  },
+  label: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+};
+
+export const IconSize = {
+  sm: 16,
+  md: 20,
+  lg: 22,
+};
