@@ -2,10 +2,11 @@
   "buildCommand": "npx expo export -p web",
   "outputDirectory": "dist",
   "framework": null,
-  "rewrites": [
-    { "source": "/", "destination": "/landing.html" },
-    { "source": "/termos", "destination": "/termos.html" },
-    { "source": "/privacidade", "destination": "/privacidade.html" },
-    { "source": "/(.*)", "destination": "/index.html" }
+  "routes": [
+    { "src": "^/$", "dest": "/landing.html" },
+    { "src": "^/termos/?$", "dest": "/termos.html" },
+    { "src": "^/privacidade/?$", "dest": "/privacidade.html" },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
