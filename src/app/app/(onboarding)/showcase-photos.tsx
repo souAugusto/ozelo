@@ -13,7 +13,7 @@ const BENEFITS = [
 ];
 
 export default function ShowcasePhotosStep() {
-  const goNext = () => router.push('/(onboarding)/showcase-nutrition');
+  const goNext = () => router.push('/app/(onboarding)/showcase-nutrition');
 
   return (
     <OnboardingScreen>

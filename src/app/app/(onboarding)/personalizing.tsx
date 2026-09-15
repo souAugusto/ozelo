@@ -18,7 +18,7 @@ export default function PersonalizingStep() {
 
   useEffect(() => {
     if (doneCount >= CHECKLIST.length) {
-      const redirect = setTimeout(() => router.replace('/(onboarding)/paywall'), 600);
+      const redirect = setTimeout(() => router.replace('/app/(onboarding)/paywall'), 600);
       return () => clearTimeout(redirect);
     }
     const timer = setTimeout(() => setDoneCount((count) => count + 1), 700);

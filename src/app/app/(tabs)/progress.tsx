@@ -96,7 +96,7 @@ export default function ProgressScreen() {
           </Card>
         </View>
 
-        <Pressable onPress={() => router.push('/photos')}>
+        <Pressable onPress={() => router.push('/app/photos')}>
           <Card style={styles.photosRow}>
             <IconCamera size={IconSize.md} color={Colors.accentAmber} strokeWidth={1.75} />
             <Text style={styles.photosLabel}>Ver fotos de progresso</Text>

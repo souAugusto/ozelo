@@ -41,7 +41,7 @@ export default function ConfirmEmailStep() {
         </Text>
       </View>
       <View style={styles.actions}>
-        <PrimaryButton label="Já confirmei, entrar" onPress={() => router.replace('/(auth)/login')} />
+        <PrimaryButton label="Já confirmei, entrar" onPress={() => router.replace('/app/(auth)/login')} />
         <SecondaryButton label="Reenviar e-mail" loading={resending} onPress={handleResend} />
       </View>
     </OnboardingScreen>

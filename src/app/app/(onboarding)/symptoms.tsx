@@ -34,7 +34,7 @@ export default function SymptomsStep() {
           />
         ))}
       </View>
-      <PrimaryButton label="Continuar" onPress={() => router.push('/(onboarding)/bowel-habit')} />
+      <PrimaryButton label="Continuar" onPress={() => router.push('/app/(onboarding)/bowel-habit')} />
     </OnboardingScreen>
   );
 }

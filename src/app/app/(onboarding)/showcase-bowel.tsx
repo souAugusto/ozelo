@@ -33,7 +33,7 @@ export default function ShowcaseBowelStep() {
         <IconCircleCheck size={IconSize.md} color={Colors.accentMint} strokeWidth={1.75} />
         <Text style={styles.badgeLabel}>Dentro do padrão esperado pra você</Text>
       </View>
-      <PrimaryButton label="Continuar" onPress={() => router.push('/(onboarding)/personalizing')} />
+      <PrimaryButton label="Continuar" onPress={() => router.push('/app/(onboarding)/personalizing')} />
     </OnboardingScreen>
   );
 }

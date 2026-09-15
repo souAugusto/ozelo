@@ -9,7 +9,7 @@ async function openCheckoutUrl(url: string) {
     window.location.assign(url);
     return;
   }
-  await WebBrowser.openAuthSessionAsync(url, 'ozelo://paywall-success');
+  await WebBrowser.openAuthSessionAsync(url, 'ozelo://app/paywall-success');
 }
 
 /** Starts a Stripe Checkout session for the chosen plan and opens it. */

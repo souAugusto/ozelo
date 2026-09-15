@@ -42,7 +42,7 @@ export default function BowelHabitStep() {
       <PrimaryButton
         label="Continuar"
         disabled={!answers.bowelFrequency}
-        onPress={() => router.push('/(onboarding)/weight-goal')}
+        onPress={() => router.push('/app/(onboarding)/weight-goal')}
       />
     </OnboardingScreen>
   );

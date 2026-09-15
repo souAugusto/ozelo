@@ -71,7 +71,7 @@ export default function ProfileScreen() {
 
   async function handleSignOut() {
     await signOut();
-    router.replace('/(auth)/login');
+    router.replace('/app/(auth)/login');
   }
 
   const treatmentMonths = monthsSince(profile?.treatment_started_at ?? null);

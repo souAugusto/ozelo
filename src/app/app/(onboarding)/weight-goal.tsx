@@ -30,7 +30,7 @@ export default function WeightGoalStep() {
           onChange={(value) => update('goalWeight', String(value))}
         />
       </View>
-      <PrimaryButton label="Continuar" onPress={() => router.push('/(onboarding)/social-proof')} />
+      <PrimaryButton label="Continuar" onPress={() => router.push('/app/(onboarding)/social-proof')} />
     </OnboardingScreen>
   );
 }

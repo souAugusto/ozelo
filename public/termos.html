@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Ozelo — Termos de Uso</title>
+<link rel="icon" type="image/svg+xml" href="/ozelo-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0F0F14; --bg-raise:#15151C; --card:#1E1E27; --card-line:#2B2B36;
+    --violet:#7C4DFF; --cyan:#00E5C7; --logo-cyan:#7CF5D0; --coral:#FF3D9A;
+    --text:#F5F3FA; --text-muted:#A9A6B8; --text-faint:#6E6B7F;
+  }
+  @media (prefers-color-scheme: dark){ :root{ --bg:#0F0F14; } }
+  :root[data-theme="dark"], :root[data-theme="light"]{ --bg:#0F0F14; }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{-webkit-font-smoothing:antialiased; scroll-behavior:smooth;}
+  body{ background:var(--bg); color:var(--text); font-family:'Inter',system-ui,sans-serif; line-height:1.6; }
+  a{ color:var(--logo-cyan); text-decoration:none; }
+  a:hover{ text-decoration:underline; }
+  h1,h2,.display{ font-family:'Bricolage Grotesque',system-ui,sans-serif; font-weight:600; letter-spacing:-0.01em; }
+  .wrap{ max-width:760px; margin:0 auto; padding:0 24px; }
+  @media (max-width:640px){ .wrap{ padding:0 22px; } }
+
+  .grain{
+    position:fixed; inset:0; z-index:0; pointer-events:none; opacity:0.045; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  body > *{ position:relative; z-index:1; }
+
+  nav{
+    position:sticky; top:0; z-index:10;
+    background:color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--card-line);
+  }
+  .nav-inner{ display:flex; align-items:center; justify-content:space-between; padding:16px 0; }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .back-link{ font-size:0.92rem; color:var(--text-muted); font-weight:500; }
+  .back-link:hover{ color:var(--text); }
+
+  header.hero{ padding:64px 0 36px; border-bottom:1px solid var(--card-line); }
+  .eyebrow{ font-size:0.85rem; color:var(--text-faint); margin-bottom:14px; }
+  h1{ font-size:clamp(1.9rem, 5vw, 2.6rem); line-height:1.12; max-width:16ch; }
+  .updated{ margin-top:18px; font-size:0.88rem; color:var(--text-faint); }
+
+  main{ padding:48px 0 100px; }
+  section{ margin-bottom:44px; }
+  section:last-of-type{ margin-bottom:0; }
+  h2{ font-size:1.2rem; margin-bottom:14px; }
+  p{ color:var(--text-muted); margin-bottom:14px; }
+  p:last-child{ margin-bottom:0; }
+  ul{ margin:0 0 14px 20px; color:var(--text-muted); }
+  li{ margin-bottom:8px; }
+  li:last-child{ margin-bottom:0; }
+  strong{ color:var(--text); font-weight:600; }
+
+  .note{
+    background:var(--card); border:1px solid var(--card-line); border-radius:16px;
+    padding:20px 22px; font-size:0.9rem; color:var(--text-muted);
+  }
+  .note strong{ display:block; margin-bottom:6px; color:var(--logo-cyan); font-size:0.82rem; letter-spacing:0.04em; }
+
+  .warn{
+    background:color-mix(in srgb, var(--coral) 10%, var(--card));
+    border:1px solid color-mix(in srgb, var(--coral) 35%, var(--card-line));
+    border-radius:16px; padding:20px 22px; font-size:0.9rem; color:var(--text-muted);
+  }
+  .warn strong{ display:block; margin-bottom:6px; color:var(--coral); font-size:0.82rem; letter-spacing:0.04em; }
+
+  .toc{
+    background:var(--card); border:1px solid var(--card-line); border-radius:16px;
+    padding:22px 24px; margin-bottom:48px;
+  }
+  .toc h2{ font-size:0.95rem; color:var(--text-faint); margin-bottom:12px; }
+  .toc ol{ list-style:decimal; margin-left:18px; color:var(--text-muted); }
+  .toc li{ margin-bottom:6px; }
+  .toc a{ color:var(--text-muted); }
+  .toc a:hover{ color:var(--logo-cyan); }
+
+  footer{
+    border-top:1px solid var(--card-line);
+    padding:30px 0; font-size:0.85rem; color:var(--text-faint);
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;
+  }
+  .footer-link{ color:var(--text-faint); font-size:0.85rem; transition:color 0.15s ease; }
+  .footer-link:hover{ color:var(--logo-cyan); text-decoration:none; }
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+
+<nav>
+  <div class="wrap nav-inner">
+    <a class="brand" href="/" aria-label="Ozelo">
+      <svg width="26" height="26" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="15" cy="15" r="15" fill="#0F0F14"/>
+        <path d="M15 7C10.58 7 7 10.58 7 15C7 19.42 10.58 23 15 23C19.42 23 23 19.42 23 15C23 10.58 19.42 7 15 7ZM15 19.4C12.57 19.4 10.6 17.43 10.6 15C10.6 12.57 12.57 10.6 15 10.6C17.43 10.6 19.4 12.57 19.4 15C19.4 17.43 17.43 19.4 15 19.4Z" fill="#7CF5D0"/>
+      </svg>
+    </a>
+    <a class="back-link" href="/">← Voltar ao site</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Ozelo</p>
+    <h1>Termos de Uso</h1>
+    <p class="updated">Última atualização: setembro de 2026</p>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <div class="note" style="margin-bottom:24px;">
+      <strong>Antes de publicar</strong>
+      Este texto é um modelo de termos de uso escrito para o Ozelo, pensado para orientar a estrutura e o conteúdo. Recomendamos revisão por um advogado antes de publicar oficialmente — especialmente as cláusulas de assinatura, cancelamento e isenção de responsabilidade médica.
+    </div>
+
+    <div class="warn" style="margin-bottom:40px;">
+      <strong>O Ozelo não é um serviço médico</strong>
+      O app ajuda você a registrar e organizar informações do seu tratamento, mas não substitui orientação médica, diagnóstico ou prescrição. Qualquer decisão sobre dose, uso ou interrupção do medicamento deve ser feita com um profissional de saúde.
+    </div>
+
+    <div class="toc">
+      <h2>Nesta página</h2>
+      <ol>
+        <li><a href="#aceitacao">Aceitação dos termos</a></li>
+        <li><a href="#servico">O que é o Ozelo</a></li>
+        <li><a href="#elegibilidade">Quem pode usar o app</a></li>
+        <li><a href="#conta">Sua conta</a></li>
+        <li><a href="#assinatura">Assinatura e pagamento</a></li>
+        <li><a href="#uso-aceitavel">Uso aceitável</a></li>
+        <li><a href="#saude">Natureza do serviço e limites médicos</a></li>
+        <li><a href="#propriedade">Propriedade intelectual</a></li>
+        <li><a href="#responsabilidade">Limitação de responsabilidade</a></li>
+        <li><a href="#cancelamento">Cancelamento e encerramento</a></li>
+        <li><a href="#alteracoes">Alterações nestes termos</a></li>
+        <li><a href="#lei">Lei aplicável</a></li>
+        <li><a href="#contato">Contato</a></li>
+      </ol>
+    </div>
+
+    <section id="aceitacao">
+      <h2>1. Aceitação dos termos</h2>
+      <p>Ao criar uma conta ou usar o Ozelo, você concorda com estes Termos de Uso e com a nossa <a href="/privacidade">Política de Privacidade</a>. Se você não concordar com algum ponto, não deve usar o app.</p>
+    </section>
+
+    <section id="servico">
+      <h2>2. O que é o Ozelo</h2>
+      <p>O Ozelo é um aplicativo de acompanhamento e organização voltado para pessoas em tratamento com medicamentos GLP-1. Ele permite registrar aplicação de medicação, alimentação, sintomas, hidratação, hábito intestinal, peso, medidas e fotos de progresso.</p>
+    </section>
+
+    <section id="elegibilidade">
+      <h2>3. Quem pode usar o app</h2>
+      <p>O Ozelo é destinado a maiores de 18 anos. Ao criar uma conta, você declara ter idade legal para contratar os nossos serviços e que as informações fornecidas são verdadeiras.</p>
+    </section>
+
+    <section id="conta">
+      <h2>4. Sua conta</h2>
+      <ul>
+        <li>Você é responsável por manter a confidencialidade da sua senha e por todas as atividades realizadas na sua conta;</li>
+        <li>Avise-nos imediatamente se suspeitar de uso não autorizado da sua conta;</li>
+        <li>Você pode excluir sua conta a qualquer momento pelas configurações do app.</li>
+      </ul>
+    </section>
+
+    <section id="assinatura">
+      <h2>5. Assinatura e pagamento</h2>
+      <p>Algumas funcionalidades do Ozelo exigem uma assinatura paga, cobrada de forma recorrente conforme o plano escolhido no momento da contratação. A cobrança é processada por um provedor de pagamentos terceirizado. Você pode cancelar sua assinatura a qualquer momento; o acesso aos recursos pagos permanece até o fim do período já pago.</p>
+    </section>
+
+    <section id="uso-aceitavel">
+      <h2>6. Uso aceitável</h2>
+      <p>Ao usar o Ozelo, você concorda em não:</p>
+      <ul>
+        <li>Usar o app para fins ilegais ou não autorizados;</li>
+        <li>Tentar acessar contas de outras pessoas ou áreas restritas do sistema;</li>
+        <li>Copiar, modificar ou fazer engenharia reversa do app;</li>
+        <li>Inserir informações falsas que possam comprometer a sua saúde ou a integridade do serviço.</li>
+      </ul>
+    </section>
+
+    <section id="saude">
+      <h2>7. Natureza do serviço e limites médicos</h2>
+      <p>O Ozelo é uma ferramenta de organização e acompanhamento pessoal — não presta serviços médicos, não emite diagnósticos e não substitui a orientação de médicos, nutricionistas ou outros profissionais de saúde. Lembretes, gráficos e resumos gerados pelo app têm caráter informativo e não devem ser a única base para decisões sobre seu tratamento.</p>
+    </section>
+
+    <section id="propriedade">
+      <h2>8. Propriedade intelectual</h2>
+      <p>A marca Ozelo, o design do app e todo o conteúdo criado por nós são de nossa propriedade ou licenciados para nós. Os dados que você insere (seus registros de saúde, fotos e medidas) continuam sendo seus — usamos essas informações apenas para operar o serviço, conforme descrito na nossa Política de Privacidade.</p>
+    </section>
+
+    <section id="responsabilidade">
+      <h2>9. Limitação de responsabilidade</h2>
+      <p>O Ozelo é fornecido "como está". Na máxima extensão permitida por lei, não nos responsabilizamos por decisões de saúde tomadas com base no app, nem por perdas indiretas decorrentes do uso ou impossibilidade de uso do serviço. Buscamos manter o app disponível e funcionando corretamente, mas não garantimos operação ininterrupta ou livre de erros.</p>
+    </section>
+
+    <section id="cancelamento">
+      <h2>10. Cancelamento e encerramento</h2>
+      <p>Você pode encerrar sua conta a qualquer momento. Podemos suspender ou encerrar contas que violem estes termos, mediante aviso prévio sempre que possível, exceto em casos de violação grave ou risco à segurança do serviço.</p>
+    </section>
+
+    <section id="alteracoes">
+      <h2>11. Alterações nestes termos</h2>
+      <p>Podemos atualizar estes termos periodicamente. Quando isso acontecer, atualizaremos a data no topo desta página e, em mudanças relevantes, avisaremos você dentro do app.</p>
+    </section>
+
+    <section id="lei">
+      <h2>12. Lei aplicável</h2>
+      <p>Estes termos são regidos pelas leis brasileiras. Eventuais disputas serão resolvidas no foro da comarca do domicílio do usuário, conforme previsto no Código de Defesa do Consumidor.</p>
+    </section>
+
+    <section id="contato">
+      <h2>13. Contato</h2>
+      <p>Dúvidas sobre estes Termos de Uso podem ser enviadas para <strong>contato@ozelo.site</strong>.</p>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  <div class="wrap" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; width:100%;">
+    <span>© 2026 Ozelo</span>
+    <a class="footer-link" href="/privacidade">Política de Privacidade</a>
+    <span>ozelo.site</span>
+  </div>
+</footer>
+
+</body>
+</html>

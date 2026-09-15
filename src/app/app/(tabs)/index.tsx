@@ -50,7 +50,7 @@ export default function DashboardScreen() {
             <Text style={Typography.subtitle}>Sua semana</Text>
             <Text style={Typography.title}>Olá, {firstName}</Text>
           </View>
-          <Pressable onPress={() => router.push('/profile')}>
+          <Pressable onPress={() => router.push('/app/profile')}>
             <Avatar initials={initialsFor(profile?.full_name ?? null)} />
           </Pressable>
         </View>
@@ -92,21 +92,21 @@ export default function DashboardScreen() {
             iconColor={Colors.accentMint}
             title="Controle intestinal"
             subtitle="Ver histórico e registrar"
-            onPress={() => router.push('/(tabs)/bowel')}
+            onPress={() => router.push('/app/(tabs)/bowel')}
           />
           <ListRow
             icon={IconStethoscope}
             iconColor={Colors.accentCoral}
             title="Sintomas"
             subtitle="Ver histórico e registrar"
-            onPress={() => router.push('/(tabs)/symptoms')}
+            onPress={() => router.push('/app/(tabs)/symptoms')}
           />
           <ListRow
             icon={IconVaccine}
             iconColor={Colors.accentAmber}
             title="Progresso"
             subtitle="Peso, medidas e fotos"
-            onPress={() => router.push('/(tabs)/progress')}
+            onPress={() => router.push('/app/(tabs)/progress')}
           />
         </View>
       </ScrollView>

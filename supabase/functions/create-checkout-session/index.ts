@@ -73,8 +73,8 @@ Deno.serve(async (req) => {
       mode: 'subscription',
       customer: customerId,
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: successUrl ?? `${Deno.env.get('APP_URL')}/paywall-success`,
-      cancel_url: cancelUrl ?? `${Deno.env.get('APP_URL')}/paywall`,
+      success_url: successUrl ?? `${Deno.env.get('APP_URL')}/app/paywall-success`,
+      cancel_url: cancelUrl ?? `${Deno.env.get('APP_URL')}/app/paywall`,
       subscription_data: { metadata: { supabase_user_id: user.id, plan } },
       client_reference_id: user.id,
     });

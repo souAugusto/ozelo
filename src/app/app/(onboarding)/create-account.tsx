@@ -47,7 +47,7 @@ export default function CreateAccountStep() {
             goal_weight_kg: answers.goalWeight || null,
             symptoms: symptomsToLog,
           },
-          emailRedirectTo: `${process.env.EXPO_PUBLIC_APP_URL}/confirm-callback`,
+          emailRedirectTo: `${process.env.EXPO_PUBLIC_APP_URL}/app/confirm-callback`,
         },
       });
       if (error) throw error;
@@ -55,7 +55,7 @@ export default function CreateAccountStep() {
       await AsyncStorage.setItem(ONBOARDING_SEEN_KEY, 'true');
 
       if (!data.session) {
-        router.replace({ pathname: '/(onboarding)/confirm-email', params: { email: email.trim() } });
+        router.replace({ pathname: '/app/(onboarding)/confirm-email', params: { email: email.trim() } });
         return;
       }
 

@@ -28,7 +28,7 @@ export default function LoginScreen() {
       }
       // Let the root route decide between the paywall and the app based on
       // the subscription status, instead of assuming access here.
-      router.replace('/');
+      router.replace('/app');
     } catch (error) {
       showAlert('Não foi possível entrar', (error as Error).message);
     } finally {
@@ -71,7 +71,7 @@ export default function LoginScreen() {
           onPress={handleLogin}
         />
 
-        <Pressable onPress={() => router.push('/(onboarding)/welcome')} style={styles.createAccount}>
+        <Pressable onPress={() => router.push('/app/(onboarding)/welcome')} style={styles.createAccount}>
           <Text style={styles.createAccountLabel}>
             Não tem conta? <Text style={styles.createAccountLink}>Criar agora</Text>
           </Text>

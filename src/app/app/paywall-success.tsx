@@ -12,7 +12,7 @@ export default function PaywallSuccessScreen() {
 
   useEffect(() => {
     refreshProfile();
-    const timer = setTimeout(() => router.replace('/(tabs)'), 1800);
+    const timer = setTimeout(() => router.replace('/app/(tabs)'), 1800);
     return () => clearTimeout(timer);
   }, [refreshProfile]);
 

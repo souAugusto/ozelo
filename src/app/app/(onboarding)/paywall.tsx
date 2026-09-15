@@ -31,7 +31,7 @@ export default function PaywallStep() {
     // their e-mail (or via the tabs guard) — skip account creation and
     // go straight to Stripe instead of showing the signup form again.
     if (!session) {
-      router.push('/(onboarding)/create-account');
+      router.push('/app/(onboarding)/create-account');
       return;
     }
     setStartingCheckout(true);
@@ -46,7 +46,7 @@ export default function PaywallStep() {
 
   async function handleApplyPromo() {
     if (!session) {
-      router.push('/(onboarding)/create-account');
+      router.push('/app/(onboarding)/create-account');
       return;
     }
     setApplyingPromo(true);
@@ -54,7 +54,7 @@ export default function PaywallStep() {
       const days = await redeemPromoCode(promoCode);
       await refreshProfile();
       showAlert('Código aplicado!', `Você ganhou ${days} dias de acesso grátis.`);
-      router.replace('/');
+      router.replace('/app');
     } catch (error) {
       showAlert('Não foi possível aplicar o código', (error as Error).message);
     } finally {

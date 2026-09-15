@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
 
     const session = await stripe.billingPortal.sessions.create({
       customer: sub.stripe_customer_id,
-      return_url: returnUrl ?? `${Deno.env.get('APP_URL')}/profile`,
+      return_url: returnUrl ?? `${Deno.env.get('APP_URL')}/app/profile`,
     });
 
     return new Response(JSON.stringify({ url: session.url }), {

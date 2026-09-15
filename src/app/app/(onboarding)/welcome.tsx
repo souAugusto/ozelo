@@ -23,8 +23,8 @@ export default function WelcomeScreen() {
         </Text>
       </View>
       <View style={styles.actions}>
-        <PrimaryButton label="Começar" onPress={() => router.push('/(onboarding)/medication')} />
-        <Pressable onPress={() => router.push('/(auth)/login')} style={styles.loginLink}>
+        <PrimaryButton label="Começar" onPress={() => router.push('/app/(onboarding)/medication')} />
+        <Pressable onPress={() => router.push('/app/(auth)/login')} style={styles.loginLink}>
           <Text style={styles.loginLinkLabel}>
             Já tem conta? <Text style={styles.loginLinkHighlight}>Entrar</Text>
           </Text>

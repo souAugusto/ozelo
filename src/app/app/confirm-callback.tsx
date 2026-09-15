@@ -8,15 +8,15 @@ import { Colors, Spacing, Typography } from '@/constants/theme';
 /**
  * Landing page for the "Confirm signup" email link (emailRedirectTo).
  * On web, supabase-js picks the session up from the URL automatically;
- * once AuthProvider reflects it, hand off to "/" to route to the paywall
- * or the app depending on subscription status.
+ * once AuthProvider reflects it, hand off to "/app" to route to the
+ * paywall or the app depending on subscription status.
  */
 export default function ConfirmCallbackScreen() {
   const { session, loading } = useAuth();
 
   useEffect(() => {
     if (!loading && session) {
-      router.replace('/');
+      router.replace('/app');
     }
   }, [loading, session]);
 

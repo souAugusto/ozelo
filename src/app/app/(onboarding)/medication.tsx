@@ -37,7 +37,7 @@ export default function MedicationStep() {
       <PrimaryButton
         label="Continuar"
         disabled={!answers.medication}
-        onPress={() => router.push('/(onboarding)/symptoms')}
+        onPress={() => router.push('/app/(onboarding)/symptoms')}
       />
     </OnboardingScreen>
   );

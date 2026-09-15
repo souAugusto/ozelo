@@ -16,8 +16,8 @@ export default function RootLayout() {
             contentStyle: { backgroundColor: Colors.background },
           }}
         >
-          <Stack.Screen name="profile" options={{ presentation: 'card' }} />
-          <Stack.Screen name="photos" options={{ presentation: 'card' }} />
+          <Stack.Screen name="app/profile" options={{ presentation: 'card' }} />
+          <Stack.Screen name="app/photos" options={{ presentation: 'card' }} />
         </Stack>
       </OnboardingProvider>
     </AuthProvider>

@@ -32,7 +32,7 @@ export default function ShowcaseNutritionStep() {
         <BarChart data={WEEK_PROTEIN} goal={PROTEIN_GOAL} />
         <Text style={styles.legend}>Linha tracejada = sua meta diária de proteína</Text>
       </Card>
-      <PrimaryButton label="Continuar" onPress={() => router.push('/(onboarding)/showcase-bowel')} />
+      <PrimaryButton label="Continuar" onPress={() => router.push('/app/(onboarding)/showcase-bowel')} />
     </OnboardingScreen>
   );
 }

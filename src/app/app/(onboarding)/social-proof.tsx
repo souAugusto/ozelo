@@ -22,7 +22,7 @@ export default function SocialProofStep() {
           <Text style={styles.quoteAuthor}>Usuária Ozelo, 3º mês de tratamento</Text>
         </Card>
       </View>
-      <PrimaryButton label="Continuar" onPress={() => router.push('/(onboarding)/showcase-photos')} />
+      <PrimaryButton label="Continuar" onPress={() => router.push('/app/(onboarding)/showcase-photos')} />
     </OnboardingScreen>
   );
 }

@@ -23,11 +23,11 @@ export default function TabsLayout() {
   }
 
   if (!session) {
-    return <Redirect href="/(auth)/login" />;
+    return <Redirect href="/app/(auth)/login" />;
   }
 
   if (!hasActiveAccess) {
-    return <Redirect href="/(onboarding)/paywall" />;
+    return <Redirect href="/app/(onboarding)/paywall" />;
   }
 
   return (
