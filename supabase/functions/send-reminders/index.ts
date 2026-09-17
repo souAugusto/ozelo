@@ -130,11 +130,18 @@ Deno.serve(async (req) => {
 
     // Medication is scheduled as an absolute timestamp (set when the user
     // saves their recurrence, and recomputed after each logged dose) rather
-    // than a daily time-of-day, so this is a direct instant comparison —
-    // no BRT arithmetic needed for this one.
+    // than a daily time-of-day, so this is a direct instant comparison — no
+    // BRT arithmetic needed for this one. The window looks BACKWARD (already
+    // due, within the last 15 minutes) rather than forward: next_medication_at
+    // is set at an arbitrary save time that isn't aligned to the cron grid,
+    // so a forward-only "due in the next 15 min" check has dead zones where a
+    // dose becomes due between two ticks *after* the schedule was saved and
+    // is never caught by any run. Looking backward guarantees the very next
+    // tick after the due instant always catches it exactly once (the
+    // reminder_sends unique constraint still guards against double-sends).
     if (profile.next_medication_at) {
       const dueAt = new Date(profile.next_medication_at).getTime();
-      if (dueAt >= nowMs && dueAt < nowMs + WINDOW_MINUTES * 60 * 1000) {
+      if (dueAt <= nowMs && dueAt > nowMs - WINDOW_MINUTES * 60 * 1000) {
         tasks.push(tryClaimAndSend(profile.id, 'medication', todayDate).then(() => void sent++));
       }
     }
