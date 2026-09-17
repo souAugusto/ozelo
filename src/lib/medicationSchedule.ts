@@ -44,9 +44,14 @@ export function computeNextMedicationAt({
   const [hh, mm] = time.split(':').map(Number);
   const anchorInstant = anchor ?? new Date();
   const anchorBrt = toBrtWallClock(anchorInstant);
-  const y = anchorBrt.getFullYear();
-  const m = anchorBrt.getMonth();
-  const d = anchorBrt.getDate();
+  // UTC getters, not local ones: anchorBrt's clock-face value is only
+  // meaningful when read as UTC. Reading it with local getters double-shifts
+  // by the device's own timezone offset (e.g. -3h more on a device already
+  // set to America/Sao_Paulo), which is exactly the class of device-timezone
+  // dependency this function exists to avoid.
+  const y = anchorBrt.getUTCFullYear();
+  const m = anchorBrt.getUTCMonth();
+  const d = anchorBrt.getUTCDate();
 
   if (frequencyType === 'interval_days') {
     const days = intervalDays && intervalDays > 0 ? intervalDays : 7;
@@ -64,7 +69,7 @@ export function computeNextMedicationAt({
 
   // weekly
   const targetWeekday = weekday ?? 1; // default Monday
-  const currentWeekday = anchorBrt.getDay();
+  const currentWeekday = anchorBrt.getUTCDay();
   const dayDiff = (targetWeekday - currentWeekday + 7) % 7;
   let candidate = brtWallClockToInstant(y, m, d + dayDiff, hh, mm);
   if (candidate.getTime() <= anchorInstant.getTime()) {
@@ -82,15 +87,15 @@ export function formatNextMedication(iso: string | null): string {
   const nowBrt = toBrtWallClock(new Date());
 
   const dayMs = 24 * 60 * 60 * 1000;
-  const targetDay = Date.UTC(targetBrt.getFullYear(), targetBrt.getMonth(), targetBrt.getDate());
-  const todayDay = Date.UTC(nowBrt.getFullYear(), nowBrt.getMonth(), nowBrt.getDate());
+  const targetDay = Date.UTC(targetBrt.getUTCFullYear(), targetBrt.getUTCMonth(), targetBrt.getUTCDate());
+  const todayDay = Date.UTC(nowBrt.getUTCFullYear(), nowBrt.getUTCMonth(), nowBrt.getUTCDate());
   const diffDays = Math.round((targetDay - todayDay) / dayMs);
 
-  const time = `${String(targetBrt.getHours()).padStart(2, '0')}:${String(targetBrt.getMinutes()).padStart(2, '0')}`;
+  const time = `${String(targetBrt.getUTCHours()).padStart(2, '0')}:${String(targetBrt.getUTCMinutes()).padStart(2, '0')}`;
 
   if (diffDays === 0) return `Hoje · ${time}`;
   if (diffDays === 1) return `Amanhã · ${time}`;
-  const weekdayShort = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'][targetBrt.getDay()];
-  const dateLabel = `${String(targetBrt.getDate()).padStart(2, '0')}/${String(targetBrt.getMonth() + 1).padStart(2, '0')}`;
+  const weekdayShort = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'][targetBrt.getUTCDay()];
+  const dateLabel = `${String(targetBrt.getUTCDate()).padStart(2, '0')}/${String(targetBrt.getUTCMonth() + 1).padStart(2, '0')}`;
   return `${weekdayShort}, ${dateLabel} · ${time}`;
 }

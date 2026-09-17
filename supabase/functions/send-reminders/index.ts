@@ -26,9 +26,12 @@ function nowInBrt() {
 }
 
 function brtDayBoundsUtc(brtNow: Date) {
-  const y = brtNow.getFullYear();
-  const m = brtNow.getMonth();
-  const d = brtNow.getDate();
+  // UTC getters: brtNow is Date.now() shifted by -3h, so its wall-clock value
+  // is only meaningful read as UTC. Local getters would additionally apply
+  // whatever timezone the runtime happens to be in.
+  const y = brtNow.getUTCFullYear();
+  const m = brtNow.getUTCMonth();
+  const d = brtNow.getUTCDate();
   const startUtc = new Date(Date.UTC(y, m, d, BRT_OFFSET_HOURS, 0, 0, 0));
   const endUtc = new Date(startUtc.getTime() + 24 * 60 * 60 * 1000);
   return { startUtc, endUtc };
@@ -104,7 +107,7 @@ Deno.serve(async (req) => {
   }
 
   const brtNow = nowInBrt();
-  const nowMinutes = brtNow.getHours() * 60 + brtNow.getMinutes();
+  const nowMinutes = brtNow.getUTCHours() * 60 + brtNow.getUTCMinutes();
   const todayDate = brtNow.toISOString().slice(0, 10);
   const { startUtc, endUtc } = brtDayBoundsUtc(brtNow);
 
