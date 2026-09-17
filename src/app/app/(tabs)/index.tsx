@@ -2,6 +2,7 @@ import {
   IconCalendar,
   IconDroplet,
   IconMeat,
+  IconSparkles,
   IconStethoscope,
   IconToiletPaper,
   IconVaccine,
@@ -88,6 +89,13 @@ export default function DashboardScreen() {
         </View>
 
         <View style={styles.sections}>
+          <ListRow
+            icon={IconSparkles}
+            iconColor={Colors.gradientStart}
+            title="Resumo"
+            subtitle="Insights e relatório em PDF"
+            onPress={() => router.push('/app/insights')}
+          />
           <ListRow
             icon={IconCalendar}
             iconColor={Colors.accentMint}
