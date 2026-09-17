@@ -1,4 +1,5 @@
 import {
+  IconCalendar,
   IconDroplet,
   IconMeat,
   IconStethoscope,
@@ -87,6 +88,13 @@ export default function DashboardScreen() {
         </View>
 
         <View style={styles.sections}>
+          <ListRow
+            icon={IconCalendar}
+            iconColor={Colors.accentMint}
+            title="Calendário"
+            subtitle="Ver seu histórico por dia"
+            onPress={() => router.push('/app/calendar')}
+          />
           <ListRow
             icon={IconToiletPaper}
             iconColor={Colors.accentMint}
