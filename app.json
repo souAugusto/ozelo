@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "ozelo",
+    "name": "Ozelo",
     "slug": "ozelo",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -21,7 +21,10 @@
     },
     "web": {
       "output": "single",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "lang": "pt-BR",
+      "themeColor": "#0F0F14",
+      "description": "Acompanhamento diário para quem usa GLP-1 (Ozempic, Mounjaro, Wegovy): medicação, alimentação, sintomas, controle intestinal e progresso."
     },
     "plugins": [
       "expo-router",
