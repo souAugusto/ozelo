@@ -5,10 +5,22 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { LineChart } from '@/components/charts/LineChart';
+import { PrimaryButton, SecondaryButton } from '@/components/ui/Button';
 import { Card, GradientCard } from '@/components/ui/Card';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { Input } from '@/components/ui/Input';
+import { RowActions } from '@/components/ui/RowActions';
+import { UndoToast } from '@/components/ui/UndoToast';
 import { useAuth } from '@/context/AuthProvider';
-import { getBodyMeasurements } from '@/lib/queries';
-import { Colors, IconSize, Radius, Spacing, Typography } from '@/constants/theme';
+import { showAlert } from '@/lib/alert';
+import { useUndoableDelete } from '@/hooks/useUndoableDelete';
+import {
+  addBodyMeasurement,
+  deleteBodyMeasurement,
+  getBodyMeasurements,
+  updateBodyMeasurement,
+} from '@/lib/queries';
+import { BorderWidth, Colors, IconSize, Radius, Spacing, Typography } from '@/constants/theme';
 import type { BodyMeasurement } from '@/types/database';
 
 function weeksSince(dateIso: string | null) {
@@ -16,19 +28,35 @@ function weeksSince(dateIso: string | null) {
   return Math.max(0, Math.floor((Date.now() - new Date(dateIso).getTime()) / (1000 * 60 * 60 * 24 * 7)));
 }
 
+function formatDate(dateIso: string) {
+  return new Date(dateIso).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
 export default function ProgressScreen() {
   const { session, profile } = useAuth();
   const [measurements, setMeasurements] = useState<BodyMeasurement[]>([]);
+  const [showForm, setShowForm] = useState(false);
+  const [editingMeasurement, setEditingMeasurement] = useState<BodyMeasurement | null>(null);
+  const [weightInput, setWeightInput] = useState('');
+  const [waistInput, setWaistInput] = useState('');
+  const [hipInput, setHipInput] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState<BodyMeasurement | null>(null);
 
-  useFocusEffect(
-    useCallback(() => {
-      if (!session) return;
-      getBodyMeasurements(session.user.id).then(setMeasurements).catch(() => {});
-    }, [session])
+  const reload = useCallback(() => {
+    if (!session) return;
+    getBodyMeasurements(session.user.id)
+      .then(setMeasurements)
+      .catch((error) => showAlert('Não foi possível carregar suas medidas', (error as Error).message));
+  }, [session]);
+
+  useFocusEffect(reload);
+
+  const { pending: pendingDelete, scheduleDelete, undo } = useUndoableDelete<BodyMeasurement>((measurement) =>
+    deleteBodyMeasurement(measurement.id)
   );
 
   const currentWeight = profile?.current_weight_kg ?? 0;
-  const goalWeight = profile?.goal_weight_kg ?? currentWeight;
   const startingWeight = measurements[0]?.weight_kg ?? currentWeight;
   const latestWeight = measurements[measurements.length - 1]?.weight_kg ?? currentWeight;
   const weightLost = Math.max(0, startingWeight - latestWeight);
@@ -38,10 +66,66 @@ export default function ProgressScreen() {
     .filter((m) => m.weight_kg !== null)
     .map((m, index) => ({ label: `S${index + 1}`, value: Number(m.weight_kg) }));
 
-  const latest = measurements[measurements.length - 1];
-  const previous = measurements[measurements.length - 2];
-  const waistDelta = latest?.waist_cm && previous?.waist_cm ? Number(latest.waist_cm) - Number(previous.waist_cm) : null;
-  const hipDelta = latest?.hip_cm && previous?.hip_cm ? Number(latest.hip_cm) - Number(previous.hip_cm) : null;
+  function resetForm() {
+    setShowForm(false);
+    setEditingMeasurement(null);
+    setWeightInput('');
+    setWaistInput('');
+    setHipInput('');
+  }
+
+  function startEdit(measurement: BodyMeasurement) {
+    setEditingMeasurement(measurement);
+    setWeightInput(measurement.weight_kg !== null ? String(measurement.weight_kg) : '');
+    setWaistInput(measurement.waist_cm !== null ? String(measurement.waist_cm) : '');
+    setHipInput(measurement.hip_cm !== null ? String(measurement.hip_cm) : '');
+    setShowForm(true);
+  }
+
+  async function handleSaveMeasurement() {
+    if (!session) return;
+    if (!weightInput && !waistInput && !hipInput) {
+      showAlert('Preencha ao menos um campo', 'Informe peso, cintura ou quadril pra registrar a medida.');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const values = {
+        weightKg: weightInput ? Number(weightInput) : null,
+        waistCm: waistInput ? Number(waistInput) : null,
+        hipCm: hipInput ? Number(hipInput) : null,
+      };
+      if (editingMeasurement) {
+        await updateBodyMeasurement(editingMeasurement.id, values);
+      } else {
+        await addBodyMeasurement(session.user.id, values);
+      }
+      resetForm();
+      reload();
+    } catch (error) {
+      showAlert('Não foi possível salvar a medida', (error as Error).message);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  function handleDeleteConfirmed() {
+    if (!confirmingDelete) return;
+    const measurement = confirmingDelete;
+    setMeasurements((prev) => prev.filter((m) => m.id !== measurement.id));
+    scheduleDelete(measurement);
+    setConfirmingDelete(null);
+  }
+
+  function handleUndo() {
+    if (!pendingDelete) return;
+    setMeasurements((prev) =>
+      [...prev, pendingDelete].sort((a, b) => new Date(a.measured_at).getTime() - new Date(b.measured_at).getTime())
+    );
+    undo();
+  }
+
+  const history = [...measurements].reverse();
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -70,31 +154,44 @@ export default function ProgressScreen() {
 
         <View style={styles.measurements}>
           <Text style={Typography.label}>Medidas corporais</Text>
-          <Card style={styles.measurementRow}>
-            <View style={styles.measurementIconWrap}>
-              <IconRuler size={IconSize.md} color={Colors.accentMint} strokeWidth={1.75} />
-            </View>
-            <Text style={styles.measurementName}>Cintura</Text>
-            <Text style={styles.measurementValue}>
-              {latest?.waist_cm ? `${latest.waist_cm} cm` : '—'}
-              {waistDelta !== null && (
-                <Text style={styles.measurementDelta}> ({waistDelta > 0 ? '+' : ''}{waistDelta.toFixed(1)})</Text>
-              )}
-            </Text>
-          </Card>
-          <Card style={styles.measurementRow}>
-            <View style={styles.measurementIconWrap}>
-              <IconRuler size={IconSize.md} color={Colors.accentMint} strokeWidth={1.75} />
-            </View>
-            <Text style={styles.measurementName}>Quadril</Text>
-            <Text style={styles.measurementValue}>
-              {latest?.hip_cm ? `${latest.hip_cm} cm` : '—'}
-              {hipDelta !== null && (
-                <Text style={styles.measurementDelta}> ({hipDelta > 0 ? '+' : ''}{hipDelta.toFixed(1)})</Text>
-              )}
-            </Text>
-          </Card>
+          {history.length === 0 && <Text style={styles.emptyState}>Nenhuma medida registrada ainda.</Text>}
+          {history.map((measurement) => (
+            <Card key={measurement.id} style={styles.measurementRow}>
+              <View style={styles.measurementIconWrap}>
+                <IconRuler size={IconSize.md} color={Colors.accentMint} strokeWidth={1.75} />
+              </View>
+              <View style={styles.measurementTextWrap}>
+                <Text style={styles.measurementDate}>{formatDate(measurement.measured_at)}</Text>
+                <Text style={styles.measurementValues}>
+                  {measurement.weight_kg !== null ? `${measurement.weight_kg} kg` : '—'}
+                  {'  ·  '}
+                  Cintura {measurement.waist_cm !== null ? `${measurement.waist_cm} cm` : '—'}
+                  {'  ·  '}
+                  Quadril {measurement.hip_cm !== null ? `${measurement.hip_cm} cm` : '—'}
+                </Text>
+              </View>
+              <RowActions onEdit={() => startEdit(measurement)} onDelete={() => setConfirmingDelete(measurement)} />
+            </Card>
+          ))}
         </View>
+
+        {showForm ? (
+          <Card style={styles.form}>
+            <Input label="Peso (kg)" value={weightInput} onChangeText={setWeightInput} placeholder="Ex: 82.5" keyboardType="decimal-pad" />
+            <Input label="Cintura (cm)" value={waistInput} onChangeText={setWaistInput} placeholder="Ex: 90" keyboardType="decimal-pad" />
+            <Input label="Quadril (cm)" value={hipInput} onChangeText={setHipInput} placeholder="Ex: 100" keyboardType="decimal-pad" />
+            <PrimaryButton
+              label={editingMeasurement ? 'Salvar alterações' : 'Salvar medida'}
+              loading={submitting}
+              onPress={handleSaveMeasurement}
+            />
+            <SecondaryButton label="Cancelar" onPress={resetForm} />
+          </Card>
+        ) : (
+          <Pressable style={styles.dashedButton} onPress={() => setShowForm(true)}>
+            <Text style={styles.dashedButtonLabel}>+ Adicionar medida</Text>
+          </Pressable>
+        )}
 
         <Pressable onPress={() => router.push('/app/photos')}>
           <Card style={styles.photosRow}>
@@ -103,6 +200,15 @@ export default function ProgressScreen() {
           </Card>
         </Pressable>
       </ScrollView>
+
+      <ConfirmModal
+        visible={!!confirmingDelete}
+        title="Excluir medida?"
+        message="Esse registro de medida será removido do seu histórico."
+        onConfirm={handleDeleteConfirmed}
+        onCancel={() => setConfirmingDelete(null)}
+      />
+      <UndoToast visible={!!pendingDelete} message="Medida excluída" onUndo={handleUndo} />
     </SafeAreaView>
   );
 }
@@ -163,17 +269,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  measurementName: {
-    ...Typography.body,
+  measurementTextWrap: {
     flex: 1,
+    gap: 2,
+  },
+  measurementDate: {
+    ...Typography.body,
     fontWeight: '600',
   },
-  measurementValue: {
-    ...Typography.body,
-    fontWeight: '700',
-  },
-  measurementDelta: {
+  measurementValues: {
     ...Typography.caption,
+  },
+  dashedButton: {
+    borderWidth: BorderWidth.hairline,
+    borderStyle: 'dashed',
+    borderColor: Colors.cardBorder,
+    borderRadius: Radius.md,
+    paddingVertical: Spacing.md,
+    alignItems: 'center',
+  },
+  dashedButtonLabel: {
+    color: Colors.textSecondary,
+    fontWeight: '600',
+  },
+  form: {
+    gap: Spacing.sm,
   },
   photosRow: {
     flexDirection: 'row',

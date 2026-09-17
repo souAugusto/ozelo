@@ -140,14 +140,34 @@ export async function getBodyMeasurements(userId: string, limit = 12) {
 
 export async function addBodyMeasurement(
   userId: string,
-  values: { weightKg?: number; waistCm?: number; hipCm?: number }
+  values: { weightKg?: number | null; waistCm?: number | null; hipCm?: number | null }
 ) {
   const { error } = await supabase.from('body_measurements').insert({
     user_id: userId,
-    weight_kg: values.weightKg,
-    waist_cm: values.waistCm,
-    hip_cm: values.hipCm,
+    weight_kg: values.weightKg ?? null,
+    waist_cm: values.waistCm ?? null,
+    hip_cm: values.hipCm ?? null,
   });
+  if (error) throw error;
+}
+
+export async function updateBodyMeasurement(
+  measurementId: string,
+  values: { weightKg?: number | null; waistCm?: number | null; hipCm?: number | null }
+) {
+  const { error } = await supabase
+    .from('body_measurements')
+    .update({
+      weight_kg: values.weightKg ?? null,
+      waist_cm: values.waistCm ?? null,
+      hip_cm: values.hipCm ?? null,
+    })
+    .eq('id', measurementId);
+  if (error) throw error;
+}
+
+export async function deleteBodyMeasurement(measurementId: string) {
+  const { error } = await supabase.from('body_measurements').delete().eq('id', measurementId);
   if (error) throw error;
 }
 
