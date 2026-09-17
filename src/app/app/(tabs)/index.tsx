@@ -1,5 +1,6 @@
 import {
   IconCalendar,
+  IconChartLine,
   IconDroplet,
   IconMeat,
   IconSparkles,
@@ -17,6 +18,7 @@ import { Avatar } from '@/components/ui/Avatar';
 import { Card, GradientCard } from '@/components/ui/Card';
 import { ListRow } from '@/components/ui/ListRow';
 import { useAuth } from '@/context/AuthProvider';
+import { formatNextMedication } from '@/lib/medicationSchedule';
 import { getTodayHydrationTotal, getTodayProteinTotal } from '@/lib/queries';
 import { Colors, IconSize, Spacing, Typography } from '@/constants/theme';
 
@@ -42,7 +44,7 @@ export default function DashboardScreen() {
   const proteinGoal = profile?.protein_goal_g ?? 90;
   const waterGoal = profile?.water_goal_ml ?? 2000;
   const firstName = profile?.full_name?.split(' ')[0] ?? 'por aí';
-  const reminderTime = profile?.reminder_time?.slice(0, 5) ?? '--:--';
+  const nextMedicationLabel = formatNextMedication(profile?.next_medication_at ?? null);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -57,17 +59,19 @@ export default function DashboardScreen() {
           </Pressable>
         </View>
 
-        <GradientCard>
-          <View style={styles.nextDoseRow}>
-            <View style={styles.nextDoseIconWrap}>
-              <IconVaccine size={IconSize.lg} color="#FFFFFF" strokeWidth={1.75} />
+        <Pressable onPress={() => router.push('/app/medication')}>
+          <GradientCard>
+            <View style={styles.nextDoseRow}>
+              <View style={styles.nextDoseIconWrap}>
+                <IconVaccine size={IconSize.lg} color="#FFFFFF" strokeWidth={1.75} />
+              </View>
+              <View>
+                <Text style={styles.nextDoseLabel}>Próxima aplicação</Text>
+                <Text style={styles.nextDoseValue}>{nextMedicationLabel}</Text>
+              </View>
             </View>
-            <View>
-              <Text style={styles.nextDoseLabel}>Próxima aplicação</Text>
-              <Text style={styles.nextDoseValue}>Hoje · {reminderTime}</Text>
-            </View>
-          </View>
-        </GradientCard>
+          </GradientCard>
+        </Pressable>
 
         <View style={styles.grid}>
           <Card style={styles.gridCard}>
@@ -89,6 +93,13 @@ export default function DashboardScreen() {
         </View>
 
         <View style={styles.sections}>
+          <ListRow
+            icon={IconVaccine}
+            iconColor={Colors.accentAmber}
+            title="Aplicação da medicação"
+            subtitle="Agendar e registrar aplicações"
+            onPress={() => router.push('/app/medication')}
+          />
           <ListRow
             icon={IconSparkles}
             iconColor={Colors.gradientStart}
@@ -118,7 +129,7 @@ export default function DashboardScreen() {
             onPress={() => router.push('/app/(tabs)/symptoms')}
           />
           <ListRow
-            icon={IconVaccine}
+            icon={IconChartLine}
             iconColor={Colors.accentAmber}
             title="Progresso"
             subtitle="Peso, medidas e fotos"

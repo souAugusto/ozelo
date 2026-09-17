@@ -111,7 +111,7 @@ Deno.serve(async (req) => {
   const { data: profiles, error } = await admin
     .from('profiles')
     .select(
-      'id, reminder_time, water_goal_ml, water_reminder_enabled, water_reminder_check_time, diary_reminder_enabled, diary_reminder_time, notification_permission'
+      'id, next_medication_at, water_goal_ml, water_reminder_enabled, water_reminder_check_time, diary_reminder_enabled, diary_reminder_time, notification_permission'
     )
     .eq('notification_permission', 'granted');
 
@@ -119,13 +119,21 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   }
 
+  const nowMs = Date.now();
   let sent = 0;
 
   for (const profile of profiles ?? []) {
     const tasks: Promise<void>[] = [];
 
-    if (profile.reminder_time && withinWindow(minutesOfDay(profile.reminder_time), nowMinutes)) {
-      tasks.push(tryClaimAndSend(profile.id, 'medication', todayDate).then(() => void sent++));
+    // Medication is scheduled as an absolute timestamp (set when the user
+    // saves their recurrence, and recomputed after each logged dose) rather
+    // than a daily time-of-day, so this is a direct instant comparison —
+    // no BRT arithmetic needed for this one.
+    if (profile.next_medication_at) {
+      const dueAt = new Date(profile.next_medication_at).getTime();
+      if (dueAt >= nowMs && dueAt < nowMs + WINDOW_MINUTES * 60 * 1000) {
+        tasks.push(tryClaimAndSend(profile.id, 'medication', todayDate).then(() => void sent++));
+      }
     }
 
     if (

@@ -17,6 +17,7 @@ export type SymptomIntensity = 'mild' | 'moderate' | 'severe';
 export type BowelType = 'normal' | 'loose' | 'hard' | 'discomfort';
 export type Units = 'metric' | 'imperial';
 export type NotificationPermissionStatus = 'not_requested' | 'granted' | 'denied';
+export type MedicationFrequencyType = 'weekly' | 'interval_days';
 
 export type Profile = {
   id: string;
@@ -38,6 +39,10 @@ export type Profile = {
   water_reminder_check_time: string;
   diary_reminder_enabled: boolean;
   diary_reminder_time: string;
+  medication_frequency_type: MedicationFrequencyType | null;
+  medication_weekday: number | null;
+  medication_interval_days: number | null;
+  next_medication_at: string | null;
   created_at: string;
   updated_at: string;
 };

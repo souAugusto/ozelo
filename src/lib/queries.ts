@@ -127,6 +127,50 @@ export async function addMedicationLog(userId: string, medication: string, dose?
   if (error) throw error;
 }
 
+export async function getRecentMedicationLogs(userId: string, limit = 10) {
+  const { data, error } = await supabase
+    .from('medication_logs')
+    .select('*')
+    .eq('user_id', userId)
+    .order('applied_at', { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function deleteMedicationLog(logId: string) {
+  const { error } = await supabase.from('medication_logs').delete().eq('id', logId);
+  if (error) throw error;
+}
+
+export async function saveMedicationSchedule(
+  userId: string,
+  schedule: {
+    frequencyType: 'weekly' | 'interval_days';
+    time: string;
+    weekday: number | null;
+    intervalDays: number | null;
+    nextMedicationAt: string;
+  }
+) {
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      reminder_time: schedule.time,
+      medication_frequency_type: schedule.frequencyType,
+      medication_weekday: schedule.weekday,
+      medication_interval_days: schedule.intervalDays,
+      next_medication_at: schedule.nextMedicationAt,
+    })
+    .eq('id', userId);
+  if (error) throw error;
+}
+
+export async function updateNextMedicationAt(userId: string, nextMedicationAt: string) {
+  const { error } = await supabase.from('profiles').update({ next_medication_at: nextMedicationAt }).eq('id', userId);
+  if (error) throw error;
+}
+
 export async function getBodyMeasurements(userId: string, limit = 12) {
   const { data, error } = await supabase
     .from('body_measurements')
