@@ -66,6 +66,7 @@ export type Meal = {
   protein_g: number;
   logged_at: string;
   created_at: string;
+  updated_at: string;
 };
 
 export type HydrationLog = {
@@ -84,6 +85,7 @@ export type SymptomLog = {
   logged_at: string;
   notes: string | null;
   created_at: string;
+  updated_at: string;
 };
 
 export type BowelLog = {
@@ -93,6 +95,7 @@ export type BowelLog = {
   logged_at: string;
   notes: string | null;
   created_at: string;
+  updated_at: string;
 };
 
 export type BodyMeasurement = {

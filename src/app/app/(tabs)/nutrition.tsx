@@ -4,12 +4,16 @@ import { useCallback, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { PrimaryButton } from '@/components/ui/Button';
+import { PrimaryButton, SecondaryButton } from '@/components/ui/Button';
 import { Card, GradientCard } from '@/components/ui/Card';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { Input } from '@/components/ui/Input';
 import { LinearProgressBar } from '@/components/ui/ProgressBar';
+import { RowActions } from '@/components/ui/RowActions';
+import { UndoToast } from '@/components/ui/UndoToast';
 import { useAuth } from '@/context/AuthProvider';
-import { addMeal, getRecentMeals, getTodayProteinTotal } from '@/lib/queries';
+import { useUndoableDelete } from '@/hooks/useUndoableDelete';
+import { addMeal, deleteMeal, getRecentMeals, getTodayProteinTotal, updateMeal } from '@/lib/queries';
 import { BorderWidth, Colors, IconSize, Radius, Spacing, Typography } from '@/constants/theme';
 import type { Meal } from '@/types/database';
 
@@ -22,9 +26,11 @@ export default function NutritionScreen() {
   const [meals, setMeals] = useState<Meal[]>([]);
   const [proteinTotal, setProteinTotal] = useState(0);
   const [showForm, setShowForm] = useState(false);
+  const [editingMeal, setEditingMeal] = useState<Meal | null>(null);
   const [mealName, setMealName] = useState('');
   const [mealProtein, setMealProtein] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState<Meal | null>(null);
 
   const proteinGoal = profile?.protein_goal_g ?? 90;
 
@@ -36,18 +42,54 @@ export default function NutritionScreen() {
 
   useFocusEffect(reload);
 
-  async function handleAddMeal() {
+  const { pending: pendingDelete, scheduleDelete, undo } = useUndoableDelete<Meal>((meal) =>
+    deleteMeal(meal.id)
+  );
+
+  function resetForm() {
+    setShowForm(false);
+    setEditingMeal(null);
+    setMealName('');
+    setMealProtein('');
+  }
+
+  function startEdit(meal: Meal) {
+    setEditingMeal(meal);
+    setMealName(meal.name);
+    setMealProtein(String(meal.protein_g));
+    setShowForm(true);
+  }
+
+  async function handleSaveMeal() {
     if (!session || !mealName || !mealProtein) return;
     setSubmitting(true);
     try {
-      await addMeal(session.user.id, mealName, Number(mealProtein));
-      setMealName('');
-      setMealProtein('');
-      setShowForm(false);
+      if (editingMeal) {
+        await updateMeal(editingMeal.id, mealName, Number(mealProtein));
+      } else {
+        await addMeal(session.user.id, mealName, Number(mealProtein));
+      }
+      resetForm();
       reload();
     } finally {
       setSubmitting(false);
     }
+  }
+
+  function handleDeleteConfirmed() {
+    if (!confirmingDelete) return;
+    const meal = confirmingDelete;
+    setMeals((prev) => prev.filter((m) => m.id !== meal.id));
+    scheduleDelete(meal);
+    setConfirmingDelete(null);
+  }
+
+  function handleUndo() {
+    if (!pendingDelete) return;
+    setMeals((prev) =>
+      [...prev, pendingDelete].sort((a, b) => new Date(b.logged_at).getTime() - new Date(a.logged_at).getTime())
+    );
+    undo();
   }
 
   return (
@@ -77,6 +119,7 @@ export default function NutritionScreen() {
                 <Text style={styles.mealTime}>{formatTime(meal.logged_at)}</Text>
               </View>
               <Text style={styles.mealProtein}>{meal.protein_g}g</Text>
+              <RowActions onEdit={() => startEdit(meal)} onDelete={() => setConfirmingDelete(meal)} />
             </Card>
           ))}
         </View>
@@ -91,7 +134,12 @@ export default function NutritionScreen() {
               placeholder="Ex: 25"
               keyboardType="decimal-pad"
             />
-            <PrimaryButton label="Salvar refeição" loading={submitting} onPress={handleAddMeal} />
+            <PrimaryButton
+              label={editingMeal ? 'Salvar alterações' : 'Salvar refeição'}
+              loading={submitting}
+              onPress={handleSaveMeal}
+            />
+            <SecondaryButton label="Cancelar" onPress={resetForm} />
           </Card>
         ) : (
           <Pressable style={styles.dashedButton} onPress={() => setShowForm(true)}>
@@ -111,6 +159,15 @@ export default function NutritionScreen() {
           </Text>
         </Card>
       </ScrollView>
+
+      <ConfirmModal
+        visible={!!confirmingDelete}
+        title="Excluir refeição?"
+        message={confirmingDelete ? `"${confirmingDelete.name}" será removida do seu diário.` : undefined}
+        onConfirm={handleDeleteConfirmed}
+        onCancel={() => setConfirmingDelete(null)}
+      />
+      <UndoToast visible={!!pendingDelete} message="Refeição excluída" onUndo={handleUndo} />
     </SafeAreaView>
   );
 }

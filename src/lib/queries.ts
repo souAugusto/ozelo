@@ -43,6 +43,16 @@ export async function addMeal(userId: string, name: string, proteinG: number) {
   if (error) throw error;
 }
 
+export async function updateMeal(mealId: string, name: string, proteinG: number) {
+  const { error } = await supabase.from('meals').update({ name, protein_g: proteinG }).eq('id', mealId);
+  if (error) throw error;
+}
+
+export async function deleteMeal(mealId: string) {
+  const { error } = await supabase.from('meals').delete().eq('id', mealId);
+  if (error) throw error;
+}
+
 export async function addHydration(userId: string, amountMl: number) {
   const { error } = await supabase.from('hydration_logs').insert({ user_id: userId, amount_ml: amountMl });
   if (error) throw error;
@@ -64,6 +74,16 @@ export async function addBowelLog(userId: string, type: BowelType, notes?: strin
   if (error) throw error;
 }
 
+export async function updateBowelLog(logId: string, type: BowelType) {
+  const { error } = await supabase.from('bowel_logs').update({ type }).eq('id', logId);
+  if (error) throw error;
+}
+
+export async function deleteBowelLog(logId: string) {
+  const { error } = await supabase.from('bowel_logs').delete().eq('id', logId);
+  if (error) throw error;
+}
+
 export async function getRecentSymptomLogs(userId: string, limit = 10) {
   const { data, error } = await supabase
     .from('symptom_logs')
@@ -77,6 +97,16 @@ export async function getRecentSymptomLogs(userId: string, limit = 10) {
 
 export async function addSymptomLog(userId: string, symptom: Symptom, intensity: SymptomIntensity) {
   const { error } = await supabase.from('symptom_logs').insert({ user_id: userId, symptom, intensity });
+  if (error) throw error;
+}
+
+export async function updateSymptomLog(logId: string, symptom: Symptom, intensity: SymptomIntensity) {
+  const { error } = await supabase.from('symptom_logs').update({ symptom, intensity }).eq('id', logId);
+  if (error) throw error;
+}
+
+export async function deleteSymptomLog(logId: string) {
+  const { error } = await supabase.from('symptom_logs').delete().eq('id', logId);
   if (error) throw error;
 }
 
