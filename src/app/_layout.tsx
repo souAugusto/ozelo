@@ -23,6 +23,8 @@ export default function RootLayout() {
             <Stack.Screen name="app/photos" options={{ presentation: 'card' }} />
             <Stack.Screen name="app/calendar" options={{ presentation: 'card' }} />
             <Stack.Screen name="app/insights" options={{ presentation: 'card' }} />
+            <Stack.Screen name="app/install-app" options={{ presentation: 'card' }} />
+            <Stack.Screen name="app/enable-notifications" options={{ presentation: 'card' }} />
           </Stack>
           <InstallPrompt />
         </OnboardingProvider>

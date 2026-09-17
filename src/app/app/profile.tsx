@@ -1,17 +1,24 @@
-import { IconClock, IconCrown, IconFileExport, IconLock, IconScale, IconStethoscope } from '@tabler/icons-react-native';
+import { IconBellRinging, IconClock, IconCrown, IconFileExport, IconLock, IconScale, IconStethoscope } from '@tabler/icons-react-native';
 import { router } from 'expo-router';
 import { ScrollView, Share, StyleSheet, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Avatar } from '@/components/ui/Avatar';
-import { TextDangerButton } from '@/components/ui/Button';
+import { PrimaryButton, TextDangerButton } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import { useAuth } from '@/context/AuthProvider';
+import { useStandalone } from '@/hooks/useStandalone';
 import { showAlert } from '@/lib/alert';
 import { openBillingPortal } from '@/lib/stripe';
 import { supabase } from '@/lib/supabase';
 import { Colors, IconSize, Spacing, Typography } from '@/constants/theme';
+
+const NOTIFICATION_STATUS_LABEL: Record<string, string> = {
+  granted: 'Ativados',
+  denied: 'Bloqueados no navegador',
+  not_requested: 'Não configurados',
+};
 
 const STATUS_LABEL: Record<string, string> = {
   active: 'Ativa',
@@ -36,10 +43,23 @@ function monthsSince(dateIso: string | null) {
 
 export default function ProfileScreen() {
   const { profile, subscription, session, signOut, refreshProfile } = useAuth();
+  const standalone = useStandalone();
 
   async function togglePrivacy(value: boolean) {
     if (!session) return;
     await supabase.from('profiles').update({ sensitive_data_private: value }).eq('id', session.user.id);
+    refreshProfile();
+  }
+
+  async function toggleWaterReminder(value: boolean) {
+    if (!session) return;
+    await supabase.from('profiles').update({ water_reminder_enabled: value }).eq('id', session.user.id);
+    refreshProfile();
+  }
+
+  async function toggleDiaryReminder(value: boolean) {
+    if (!session) return;
+    await supabase.from('profiles').update({ diary_reminder_enabled: value }).eq('id', session.user.id);
     refreshProfile();
   }
 
@@ -107,6 +127,55 @@ export default function ProfileScreen() {
               </View>
               <Text style={styles.rowValue}>{profile?.reminder_time?.slice(0, 5) ?? '—'}</Text>
             </View>
+          </Card>
+        </View>
+
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <IconBellRinging size={IconSize.md} color={Colors.accentCoral} strokeWidth={1.75} />
+            <Text style={Typography.label}>Notificações</Text>
+          </View>
+          <Card style={styles.sectionCard}>
+            <View style={styles.row}>
+              <Text style={styles.rowLabel}>Status</Text>
+              <Text style={styles.rowValue}>
+                {!standalone
+                  ? 'App não instalado'
+                  : NOTIFICATION_STATUS_LABEL[profile?.notification_permission ?? 'not_requested']}
+              </Text>
+            </View>
+
+            {!standalone && (
+              <PrimaryButton label="Instalar app" onPress={() => router.push('/app/install-app')} />
+            )}
+
+            {standalone && profile?.notification_permission !== 'granted' && (
+              <PrimaryButton
+                label="Ativar lembretes"
+                onPress={() => router.push('/app/enable-notifications')}
+              />
+            )}
+
+            {standalone && profile?.notification_permission === 'granted' && (
+              <>
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>Lembrete de hidratação</Text>
+                  <Switch
+                    value={profile?.water_reminder_enabled ?? true}
+                    onValueChange={toggleWaterReminder}
+                    trackColor={{ true: Colors.gradientStart, false: Colors.cardBorder }}
+                  />
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>Lembrete do diário alimentar</Text>
+                  <Switch
+                    value={profile?.diary_reminder_enabled ?? true}
+                    onValueChange={toggleDiaryReminder}
+                    trackColor={{ true: Colors.gradientStart, false: Colors.cardBorder }}
+                  />
+                </View>
+              </>
+            )}
           </Card>
         </View>
 

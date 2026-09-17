@@ -54,7 +54,7 @@ export default function PaywallStep() {
       const days = await redeemPromoCode(promoCode);
       await refreshProfile();
       showAlert('Código aplicado!', `Você ganhou ${days} dias de acesso grátis.`);
-      router.replace('/app');
+      router.replace('/app/install-app');
     } catch (error) {
       showAlert('Não foi possível aplicar o código', (error as Error).message);
     } finally {

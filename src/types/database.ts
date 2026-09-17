@@ -16,6 +16,7 @@ export type Symptom = 'nausea' | 'reflux' | 'headache' | 'dizziness' | 'fatigue'
 export type SymptomIntensity = 'mild' | 'moderate' | 'severe';
 export type BowelType = 'normal' | 'loose' | 'hard' | 'discomfort';
 export type Units = 'metric' | 'imperial';
+export type NotificationPermissionStatus = 'not_requested' | 'granted' | 'denied';
 
 export type Profile = {
   id: string;
@@ -32,8 +33,22 @@ export type Profile = {
   sensitive_data_private: boolean;
   treatment_started_at: string | null;
   onboarding_completed_at: string | null;
+  notification_permission: NotificationPermissionStatus;
+  water_reminder_enabled: boolean;
+  water_reminder_check_time: string;
+  diary_reminder_enabled: boolean;
+  diary_reminder_time: string;
   created_at: string;
   updated_at: string;
+};
+
+export type PushSubscriptionRow = {
+  id: string;
+  user_id: string;
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  created_at: string;
 };
 
 export type Subscription = {
@@ -142,6 +157,10 @@ export type Database = {
       bowel_logs: Table<BowelLog, Partial<BowelLog> & { user_id: string; type: BowelType }>;
       body_measurements: Table<BodyMeasurement, Partial<BodyMeasurement> & { user_id: string }>;
       progress_photos: Table<ProgressPhoto, Partial<ProgressPhoto> & { user_id: string; storage_path: string }>;
+      push_subscriptions: Table<
+        PushSubscriptionRow,
+        Partial<PushSubscriptionRow> & { user_id: string; endpoint: string; p256dh: string; auth: string }
+      >;
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

@@ -1,7 +1,7 @@
 // Ozelo service worker — app-shell caching so already-visited screens open
-// fast and keep working offline. Bumping CACHE_VERSION invalidates old caches
-// on the next deploy.
-const CACHE_VERSION = 'ozelo-v1';
+// fast and keep working offline, plus Web Push handling. Bumping
+// CACHE_VERSION invalidates old caches on the next deploy.
+const CACHE_VERSION = 'ozelo-v2';
 const APP_SHELL = [
   '/',
   '/app',
@@ -61,6 +61,42 @@ self.addEventListener('fetch', (event) => {
         })
         .catch(() => cached);
       return cached ?? networkFetch;
+    })
+  );
+});
+
+// --- Web Push -----------------------------------------------------------
+self.addEventListener('push', (event) => {
+  let payload = { title: 'Ozelo', body: 'Você tem uma novidade no app.', url: '/app' };
+  try {
+    if (event.data) payload = { ...payload, ...event.data.json() };
+  } catch {
+    // ignore malformed payloads, fall back to the default copy above
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(payload.title, {
+      body: payload.body,
+      icon: '/icons/icon-192.png',
+      badge: '/icons/icon-192.png',
+      data: { url: payload.url },
+    })
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const targetUrl = event.notification.data?.url || '/app';
+
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientsList) => {
+      for (const client of clientsList) {
+        if ('focus' in client) {
+          client.navigate(targetUrl);
+          return client.focus();
+        }
+      }
+      return self.clients.openWindow(targetUrl);
     })
   );
 });

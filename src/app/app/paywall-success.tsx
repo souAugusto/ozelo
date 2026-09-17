@@ -12,7 +12,10 @@ export default function PaywallSuccessScreen() {
 
   useEffect(() => {
     refreshProfile();
-    const timer = setTimeout(() => router.replace('/app/(tabs)'), 1800);
+    // New subscribers get introduced to installing the app (needed for
+    // reminders to work reliably) right after paying, instead of every
+    // future session — returning users go straight to the dashboard.
+    const timer = setTimeout(() => router.replace('/app/install-app'), 1800);
     return () => clearTimeout(timer);
   }, [refreshProfile]);
 
