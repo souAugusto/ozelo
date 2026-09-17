@@ -10,6 +10,7 @@ import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { Input } from '@/components/ui/Input';
 import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
+import { TimeField } from '@/components/ui/TimeField';
 import { UndoToast } from '@/components/ui/UndoToast';
 import { useAuth } from '@/context/AuthProvider';
 import { useUndoableDelete } from '@/hooks/useUndoableDelete';
@@ -191,7 +192,7 @@ export default function MedicationScreen() {
             />
           )}
 
-          <Input label="Horário (24h)" value={time} onChangeText={setTime} placeholder="Ex: 08:00" />
+          <TimeField label="Horário" value={time} onChange={setTime} />
 
           <PrimaryButton label="Salvar agendamento" loading={savingSchedule} onPress={handleSaveSchedule} />
         </Card>
